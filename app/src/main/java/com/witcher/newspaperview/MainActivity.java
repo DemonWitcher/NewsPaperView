@@ -198,10 +198,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     // Do whatever you want with Bitmap
                     if(count%2==0){
                         Bitmap b = Bitmap.createScaledBitmap(loadedImage,loadedImage.getWidth()/2,loadedImage.getHeight()/2,true);
-                        mNewsPaperView.addPaper(b,count%2==0);
+                        mNewsPaperView.addPaper(b);
                     }else{
                         Bitmap b = Bitmap.createScaledBitmap(loadedImage,loadedImage.getWidth()/2,loadedImage.getHeight(),true);
-                        mNewsPaperView.addPaper(b,count%2==0);
+                        mNewsPaperView.addPeople(b,true);
                     }
                     count++;
                 }
@@ -210,4 +210,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
     public static int count = 0;
+
 }

@@ -18,9 +18,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.List;
 
-import androidx.annotation.IntRange;
-import androidx.annotation.NonNull;
-
 public abstract class BaseView extends View {
 
     public interface OnSizeChangeListener {
@@ -87,7 +84,7 @@ public abstract class BaseView extends View {
         return (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
     }
 
-    public float getDistanceOld(MotionEvent event,float centerX,float centerY) {
+    public float getDistanceOld(MotionEvent event, float centerX, float centerY) {
         float x = centerX - event.getX();
         float y = centerY - event.getY();
         return (float) Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
@@ -105,7 +102,7 @@ public abstract class BaseView extends View {
 
     public PointF midPointSingle(float centerX, float centerY) {
         PointF point = new PointF();
-        point.set(centerX,centerY);
+        point.set(centerX, centerY);
         return point;
     }
 
@@ -117,7 +114,7 @@ public abstract class BaseView extends View {
         return (float) Math.toDegrees(radians);
     }
 
-    public float getRotationOld(MotionEvent event,float centerX,float centerY) {
+    public float getRotationOld(MotionEvent event, float centerX, float centerY) {
         double x = centerX - event.getX();
         double y = centerY - event.getY();
         double radians = Math.atan2(y, x);
@@ -219,14 +216,15 @@ public abstract class BaseView extends View {
         return getBitmapPoints(imageGroup.bitmap, imageGroup.matrix);
     }
 
-    public float getCenterX(ImageGroup imageGroup){
+    public float getCenterX(ImageGroup imageGroup) {
         float[] points = getBitmapPoints(imageGroup);
         //如果中心点要出屏幕  就不移动了
         float x1 = points[0];
         float x4 = points[6];
         return x1 + ((x4 - x1) / 2);
     }
-    public float getCenterY(ImageGroup imageGroup){
+
+    public float getCenterY(ImageGroup imageGroup) {
         float[] points = getBitmapPoints(imageGroup);
         //如果中心点要出屏幕  就不移动了
         float y1 = points[1];
@@ -256,9 +254,9 @@ public abstract class BaseView extends View {
         public Matrix matrix = new Matrix();
         public float scale = 1.0f;
         public float rotation = 0f;
-        public boolean isPaper;
+        public boolean isPaper;//根据业务需求 存一下是普通贴纸 还是人物贴纸
         public int test;
-        private float[] matrixValues = new float[9];
+        public boolean haveMove;//根据业务需求  记录一下本贴纸是否移动过
 
         public void release() {
             if (bitmap != null) {
@@ -279,10 +277,8 @@ public abstract class BaseView extends View {
             float[] unrotatedPoint = new float[2];
             tempMatrix.mapPoints(unrotatedWrapperCorner, getMappedBoundPoints());
             tempMatrix.mapPoints(unrotatedPoint, new float[]{x, y});
-            return StickerUtils.trapToRect(unrotatedWrapperCorner)
-                    .contains(unrotatedPoint[0], unrotatedPoint[1]);
+            return StickerUtils.trapToRect(unrotatedWrapperCorner).contains(unrotatedPoint[0], unrotatedPoint[1]);
         }
-
 
         public float[] getMappedBoundPoints() {
             float[] dst = new float[8];
@@ -297,24 +293,12 @@ public abstract class BaseView extends View {
         }
 
         public float getCurrentAngle() {
-            return getMatrixAngle(matrix);
+            return MatrixUtil.getMatrixAngle(matrix);
         }
 
-        private float getMatrixScale(@NonNull Matrix matrix) {
-            return (float) Math.sqrt(Math.pow(getMatrixValue(matrix, Matrix.MSCALE_X), 2) + Math.pow(
-                    getMatrixValue(matrix, Matrix.MSKEW_Y), 2));
+        public float getCurrentScale() {
+            return MatrixUtil.getMatrixScale(matrix);
         }
-
-        private float getMatrixAngle(@NonNull Matrix matrix) {
-            return (float) -(Math.atan2(getMatrixValue(matrix, Matrix.MSKEW_X),
-                    getMatrixValue(matrix, Matrix.MSCALE_X)) * (180 / Math.PI));
-        }
-
-        private float getMatrixValue(@NonNull Matrix matrix, @IntRange(from = 0, to = 9) int valueIndex) {
-            matrix.getValues(matrixValues);
-            return matrixValues[valueIndex];
-        }
-
 
         @Override
         public String toString() {
