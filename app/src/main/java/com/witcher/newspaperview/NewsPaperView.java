@@ -31,20 +31,11 @@ import java.util.Random;
 
 public class NewsPaperView extends BaseView {
 
-    //男女头部距离顶部距离 控件整体高度的千分比
-    public static final int MAN_TOP = 75;
-    public static final int WOMAN_TOP = 120;
-    //人物脚部距离底部距离 控件整体高度的千分比
-    public static final int PEOPLE_BOTTOM = 130;
-
     //缩放边界
     public static final float PAPER_SCALE_MAX = 5f;
     public static final float PAPER_SCALE_MIN = 0.2f;
-    public static final float PEOPLE_SCALE_MAX = 2f;
-    public static final float PEOPLE_SCALE_MIN = 0.5f;
     //数量边界
     public static final int PAPER_MAX = 20;
-    public static final int PEOPLE_MAX = 5;
 
     private final Paint mPaintForLineAndCircle;
     private final Paint mPaintFlip;
@@ -70,8 +61,8 @@ public class NewsPaperView extends BaseView {
     public NewsPaperView(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
         mDeleteIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_close);
-        mFlipIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_close);
-        mMoveIcon = BitmapFactory.decodeResource(getResources(), R.drawable.ic_close);
+        mFlipIcon = BitmapFactory.decodeResource(getResources(), R.drawable.jingxiang);
+        mMoveIcon = BitmapFactory.decodeResource(getResources(), R.drawable.yidong);
         mIconWidth = 40;
         mPaintForLineAndCircle = new Paint();
         mPaintForLineAndCircle.setAntiAlias(true);
@@ -93,20 +84,10 @@ public class NewsPaperView extends BaseView {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        //先画人物
+        //画贴纸
         for (int i = 0; i < mDecalImageGroupList.size(); ++i) {
             ImageGroup imageGroup = mDecalImageGroupList.get(i);
-            if (!imageGroup.isPaper) {
-                drawPaper(canvas, imageGroup);
-            }
-        }
-
-        //再画贴纸
-        for (int i = 0; i < mDecalImageGroupList.size(); ++i) {
-            ImageGroup imageGroup = mDecalImageGroupList.get(i);
-            if (imageGroup.isPaper) {
-                drawPaper(canvas, imageGroup);
-            }
+            drawPaper(canvas, imageGroup);
         }
 
         //最后画控制UI
@@ -126,11 +107,7 @@ public class NewsPaperView extends BaseView {
         float x4 = points[6];
         float y4 = points[7];
 
-        if (imageGroup.isPaper) {
-            mPaintForLineAndCircle.setColor(Color.RED);
-        } else {
-            mPaintForLineAndCircle.setColor(Color.BLUE);
-        }
+        mPaintForLineAndCircle.setColor(Color.RED);
         canvas.drawLine(x1, y1, x2, y2, mPaintForLineAndCircle);
         canvas.drawLine(x2, y2, x4, y4, mPaintForLineAndCircle);
         canvas.drawLine(x4, y4, x3, y3, mPaintForLineAndCircle);
@@ -226,11 +203,11 @@ public class NewsPaperView extends BaseView {
                         //缩放界限检测
                         float downScale = MatrixUtil.getMatrixScale(mDownMatrix);
                         float newScale = mCurrentScale * downScale;
-                        if (newScale >= getScaleMax(imageGroup.isPaper)) {
-                            mCurrentScale = getScaleMax(imageGroup.isPaper) / downScale;
+                        if (newScale >= PAPER_SCALE_MAX) {
+                            mCurrentScale = PAPER_SCALE_MAX / downScale;
                         }
-                        if (newScale <= getScaleMin(imageGroup.isPaper)) {
-                            mCurrentScale = getScaleMin(imageGroup.isPaper) / downScale;
+                        if (newScale <= PAPER_SCALE_MIN) {
+                            mCurrentScale = PAPER_SCALE_MIN / downScale;
                         }
                         L.i("mCurrentScale:" + mCurrentScale);
                         mMoveMatrix.postScale(mCurrentScale, mCurrentScale, mMidPoint.x, mMidPoint.y);// 縮放
@@ -275,11 +252,11 @@ public class NewsPaperView extends BaseView {
                         L.i("mCurrentScale:" + mCurrentScale);
                         float downScale = MatrixUtil.getMatrixScale(mDownMatrix);
                         float newScale = mCurrentScale * downScale;
-                        if (newScale >= getScaleMax(imageGroup.isPaper)) {
-                            mCurrentScale = getScaleMax(imageGroup.isPaper) / downScale;
+                        if (newScale >= PAPER_SCALE_MAX) {
+                            mCurrentScale = PAPER_SCALE_MAX / downScale;
                         }
-                        if (newScale <= getScaleMin(imageGroup.isPaper)) {
-                            mCurrentScale = getScaleMin(imageGroup.isPaper) / downScale;
+                        if (newScale <= PAPER_SCALE_MIN) {
+                            mCurrentScale = PAPER_SCALE_MIN / downScale;
                         }
 
                         mMoveMatrix.postScale(mCurrentScale, mCurrentScale, mMidPoint.x, mMidPoint.y);// 縮放
@@ -525,96 +502,11 @@ public class NewsPaperView extends BaseView {
         return index;
     }
 
-    public int addPeople(Bitmap bitmap, boolean man) {
-        if (bitmap == null) {
-            return -2;
-        }
-        int peopleCount = 0;
-
-        for (ImageGroup imageGroup : mDecalImageGroupList) {
-            if (!imageGroup.isPaper) {
-                peopleCount++;
-            }
-        }
-
-        //数量控制
-        if (peopleCount >= PEOPLE_MAX) {
-            return -1;
-        }
-
-        ImageGroup imageGroupTemp = new ImageGroup();
-        imageGroupTemp.test = test;
-        test++;
-//        Bitmap newB;
-//        //根据规则控制人物入场尺寸
-//        if (man) {
-//            int targetHeight = getHeight() * (MAN_TOP + PEOPLE_BOTTOM) / 1000;
-//            float scale = (float) targetHeight / bitmap.getHeight();
-//            int newWidth = (int) (bitmap.getWidth() * scale);
-//            if (newWidth == 0 || targetHeight == 0) {
-//                return -3;
-//            }
-//            newB = Bitmap.createScaledBitmap(bitmap, newWidth, targetHeight, true);
-//        } else {
-//            int targetHeight = getHeight() * (WOMAN_TOP + PEOPLE_BOTTOM) / 1000;
-//            float scale = (float) targetHeight / bitmap.getHeight();
-//            int newWidth = (int) (bitmap.getWidth() * scale);
-//            if (newWidth == 0 || targetHeight == 0) {
-//                return -3;
-//            }
-//            newB = Bitmap.createScaledBitmap(bitmap, newWidth, targetHeight, true);
-//        }
-//        imageGroupTemp.bitmap = newB;
-        imageGroupTemp.bitmap = bitmap;
-        imageGroupTemp.isPaper = false;
-        if (imageGroupTemp.matrix == null) {
-            imageGroupTemp.matrix = new Matrix();
-        }
-        //落点控制
-//        float transX;
-//        float transY = (getHeight() - imageGroupTemp.bitmap.getHeight()) / 2;
-//        if (man) {
-//            transX = getHeight() * MAN_TOP / 1000;
-//        } else {
-//            transX = getHeight() * WOMAN_TOP / 1000;
-//        }
-//        //等产品出需求
-//        if (peopleCount == 0) {
-//
-//        } else if (peopleCount == 1) {
-//
-//        } else if (peopleCount == 2) {
-//
-//        } else if (peopleCount == 3) {
-//
-//        } else if (peopleCount == 4) {
-//
-//        }
-        float transX = (getWidth() - imageGroupTemp.bitmap.getWidth()) / 2;
-        float transY = (getHeight() - imageGroupTemp.bitmap.getHeight()) / 2;
-        imageGroupTemp.matrix.postTranslate(transX, transY);
-
-        mDecalImageGroupList.add(imageGroupTemp);
-        mShowUI = true;
-        invalidate();
-        return 0;
-    }
-
-    public void reLayoutPeople() {
-        //等产品出需求
-    }
-
     public int addPaper(Bitmap bitmap) {
         if (bitmap == null) {
             return -2;
         }
-        int paperCount = 0;
-
-        for (ImageGroup imageGroup : mDecalImageGroupList) {
-            if (imageGroup.isPaper) {
-                paperCount++;
-            }
-        }
+        int paperCount = mDecalImageGroupList.size();
 
         //数量控制
         if (paperCount >= PAPER_MAX) {
@@ -625,22 +517,22 @@ public class NewsPaperView extends BaseView {
         imageGroupTemp.test = test;
         test++;
         imageGroupTemp.bitmap = bitmap;
-        imageGroupTemp.isPaper = true;
         if (imageGroupTemp.matrix == null) {
             imageGroupTemp.matrix = new Matrix();
         }
         //落点控制
+        float transX;
+        float transY;
         if (paperCount == 0) {
             //中间落点
-            float transX = (getWidth() - imageGroupTemp.bitmap.getWidth()) / 2;
-            float transY = (getHeight() - imageGroupTemp.bitmap.getHeight()) / 2;
-            imageGroupTemp.matrix.postTranslate(transX, transY);
+            transX = (getWidth() - imageGroupTemp.bitmap.getWidth()) / 2;
+            transY = (getHeight() - imageGroupTemp.bitmap.getHeight()) / 2;
         } else {
             //随机落点
-            float transX = new Random().nextInt(getWidth() - imageGroupTemp.bitmap.getWidth());
-            float transY = new Random().nextInt(getHeight() - imageGroupTemp.bitmap.getHeight());
-            imageGroupTemp.matrix.postTranslate(transX, transY);
+            transX = new Random().nextInt(getWidth() - imageGroupTemp.bitmap.getWidth());
+            transY = new Random().nextInt(getHeight() - imageGroupTemp.bitmap.getHeight());
         }
+        imageGroupTemp.matrix.postTranslate(transX, transY);
 
         mDecalImageGroupList.add(imageGroupTemp);
         mShowUI = true;
@@ -653,19 +545,4 @@ public class NewsPaperView extends BaseView {
         invalidate();
     }
 
-    private static float getScaleMax(boolean isPaper) {
-        if (isPaper) {
-            return PAPER_SCALE_MAX;
-        } else {
-            return PEOPLE_SCALE_MAX;
-        }
-    }
-
-    private static float getScaleMin(boolean isPaper) {
-        if (isPaper) {
-            return PAPER_SCALE_MIN;
-        } else {
-            return PEOPLE_SCALE_MIN;
-        }
-    }
 }

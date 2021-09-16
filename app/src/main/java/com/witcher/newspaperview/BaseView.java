@@ -254,7 +254,6 @@ public abstract class BaseView extends View {
         public Matrix matrix = new Matrix();
         public float scale = 1.0f;
         public float rotation = 0f;
-        public boolean isPaper;//根据业务需求 存一下是普通贴纸 还是人物贴纸
         public int test;
         public boolean haveMove;//根据业务需求  记录一下本贴纸是否移动过
 
@@ -273,11 +272,11 @@ public abstract class BaseView extends View {
         public boolean contains(float x, float y) {
             Matrix tempMatrix = new Matrix();
             tempMatrix.setRotate(-getCurrentAngle());
-            float[] unrotatedWrapperCorner = new float[8];
-            float[] unrotatedPoint = new float[2];
-            tempMatrix.mapPoints(unrotatedWrapperCorner, getMappedBoundPoints());
-            tempMatrix.mapPoints(unrotatedPoint, new float[]{x, y});
-            return StickerUtils.trapToRect(unrotatedWrapperCorner).contains(unrotatedPoint[0], unrotatedPoint[1]);
+            float[] unRotatedWrapperCorner = new float[8];
+            float[] unRotatedPoint = new float[2];
+            tempMatrix.mapPoints(unRotatedWrapperCorner, getMappedBoundPoints());
+            tempMatrix.mapPoints(unRotatedPoint, new float[]{x, y});
+            return StickerUtils.trapToRect(unRotatedWrapperCorner).contains(unRotatedPoint[0], unRotatedPoint[1]);
         }
 
         public float[] getMappedBoundPoints() {

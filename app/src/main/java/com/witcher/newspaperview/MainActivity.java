@@ -195,14 +195,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ImageLoader.getInstance().loadImage(decalList[getPosition()], new SimpleImageLoadingListener() {
                 @Override
                 public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                    // Do whatever you want with Bitmap
+                    Bitmap b;
                     if(count%2==0){
-                        Bitmap b = Bitmap.createScaledBitmap(loadedImage,loadedImage.getWidth()/2,loadedImage.getHeight()/2,true);
-                        mNewsPaperView.addPaper(b);
+                        b = Bitmap.createScaledBitmap(loadedImage, loadedImage.getWidth() / 2, loadedImage.getHeight() / 2, true);
                     }else{
-                        Bitmap b = Bitmap.createScaledBitmap(loadedImage,loadedImage.getWidth()/2,loadedImage.getHeight(),true);
-                        mNewsPaperView.addPeople(b,true);
+                        b = Bitmap.createScaledBitmap(loadedImage, loadedImage.getWidth() / 2, loadedImage.getHeight(), true);
                     }
+                    mNewsPaperView.addPaper(b);
                     count++;
                 }
             });
